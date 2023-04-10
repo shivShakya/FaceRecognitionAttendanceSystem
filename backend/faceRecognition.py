@@ -40,8 +40,8 @@ def getImageFromVideo(url,name):
 
 def getCroppedImage(url):
        try:
-         face_cascade = cv2.CascadeClassifier('haarcascades/haarcascade_frontalface_default.xml')
-         eye_cascade = cv2.CascadeClassifier('haarcascades/haarcascade_eye.xml')
+         face_cascade = cv2.CascadeClassifier('backend/haarcascades/haarcascade_frontalface_default.xml')
+         eye_cascade = cv2.CascadeClassifier('backend/haarcascades/haarcascade_eye.xml')
         # response = requests.get(url)
         # img = np.array(Image.open(BytesIO(response.content)))
          img = cv2.imread(url)
@@ -105,11 +105,11 @@ def load():
                    count +=1
        
     
-    if os.path.exists("face_dict.json"):
-        with open("face_dict.json", "w") as f:
+    if os.path.exists("backend/face_dict.json"):
+        with open("backend/face_dict.json", "w") as f:
                 json.dump(face_name_dict, f, indent=4)
            
-    with open("face_dict.json","rb") as f:
+    with open("backend/face_dict.json","rb") as f:
           face_dict = json.load(f)
     
     return face_dict
@@ -141,12 +141,16 @@ def getInput(face_dict):
       count = 0 
       X =[]
       y = []
+     
       for name in face_dict.keys():
             class_dict[name] = count
             count = count +1 
-      if os.path.exists("token.json"):
-          with open("token.json","w") as f:
+
+      print(class_dict)
+      if os.path.exists("backend/token.json"):
+          with open("backend/token.json","w") as f:
                 json.dump(class_dict,f)
+                
       for name,training_files in face_dict.items():
             for training_image in training_files:
                img = cv2.imread(training_image)
@@ -165,16 +169,26 @@ def getInput(face_dict):
 
 # fit the model using machine learning algorithms
 def ModelFit(X,y):
+      store = { 'X_tests':[], 'y_tests':[]} 
       X_train,X_tests,y_train,y_test = train_test_split(X,y,test_size = 0.10,random_state=42)
       pipe = Pipeline([('scaler',StandardScaler()),('svc',SVC(kernel='rbf', C =10))])
       pipe.fit(X_train,y_train)
+      
+      for i in X_tests:
+          store['X_tests'].append(i)
+      for j in y_test:
+           store['y_tests'].append(j) 
+
+      with open('backend/test_values.json','w') as f:
+            json.dump(store,f)
 
       
-      with open('model.pkl','wb') as f:
+
+      with open('backend/model.pkl','wb') as f:
                     pickle.dump(pipe,f)
      
        
-      with open('model.pkl','rb') as f:
+      with open('backend/model.pkl','rb') as f:
                model = pickle.load(f)
 
       return model

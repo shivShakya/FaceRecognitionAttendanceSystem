@@ -45,8 +45,8 @@ def w2d(img, mode = 'haar', level = 1):
 # function for cropping the images 
 def getCroppedImage(url):
        try:
-         face_cascade = cv2.CascadeClassifier('haarcascades/haarcascade_frontalface_default.xml')
-         eye_cascade = cv2.CascadeClassifier('haarcascades/haarcascade_eye.xml')
+         face_cascade = cv2.CascadeClassifier('backend/haarcascades/haarcascade_frontalface_default.xml')
+         eye_cascade = cv2.CascadeClassifier('backend/haarcascades/haarcascade_eye.xml')
         # response = requests.get(url)
         # img = np.array(Image.open(BytesIO(response.content)))
          img = cv2.imread(url)
@@ -77,7 +77,7 @@ def load():
     for entry in os.scandir(path_to_data):
          if entry.is_dir():
                img_dirs.append(entry.path)
-    img_dirs
+    print(img_dirs)
 
 
 #create cropped test function
@@ -91,6 +91,7 @@ def load():
     for img_dir in img_dirs:
       count = 1
       name = img_dir.split('/')[-1]
+      print(name)
       
       for entry in os.scandir(img_dir):
             cropped_img = getCroppedImage(entry.path)
@@ -103,6 +104,7 @@ def load():
                    
                    cropped_file_name = name + str(count) + ".png"
                    cropped_file_path = cropped_folder  + "/" + cropped_file_name
+                   
                    cv2.imwrite(cropped_file_path,cropped_img)
                    
                    if name not in face_test_dict:
@@ -110,20 +112,24 @@ def load():
                    face_test_dict[name].append(cropped_file_path)
                   
                    count +=1
+                  
 
 
 #write a json file with all the names of images
     if  os.path.exists("test_dict.json"):
       with open("test_dict.json","w") as f:
              json.dump(face_test_dict,f)
-      with open("test_dict.json",'rb') as f:
+             print('successfull')
+     
+    return face_test_dict
+
+
+def getTestInput(test_url):
+    
+    with open(test_url,'rb') as f:
            test_dict =  json.load(f)
-    return test_dict
-
-
-def getTestInput(test_dict):
+           print(test_dict)
     X_test = []
-
     # read that file and apply operations
     for name,testing_files in  test_dict.items():
        for testing_image in testing_files:

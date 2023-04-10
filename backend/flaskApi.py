@@ -53,30 +53,33 @@ def predict():
     encoded_data = base64.b64encode(byte_data)
     byte_data = base64.b64decode(encoded_data)
     with io.BytesIO(byte_data) as f:
-                   with open('test.mp4', 'wb') as out_file:
-                               shutil.copyfileobj(f, out_file)
+       with open('test.mp4', 'wb') as out_file:
+                shutil.copyfileobj(f, out_file)
 
     test_data.getImageFromVideo("test.mp4")
-    test_dict = test_data.load()
-    X_test = test_data.getTestInput(test_dict)
-
-    #manually
-    with open('model.pkl','rb') as f:
-              model = pickle.load(f)
+    face_dict =  test_data.load()
+   
+    url = "backend/test_dict.json"
+    X_test = test_data.getTestInput(url)
     
-    #face_dict =  faceRecognition.load()
-    #X,y = faceRecognition.getInput(face_dict)
-    #model = faceRecognition.ModelFit(X,y)
+    #manually
+    #with open('model.pkl','rb') as f:
+              #model = pickle.load(f)
+    
+    face_dict =  faceRecognition.load()
+    X,y = faceRecognition.getInput(face_dict)
+
+    model = faceRecognition.ModelFit(X,y)
 
     prediction = model.predict(X_test)
     print(prediction)
 
     
     
-    with open('token.json','rb') as f:
+    with open('backend/token.json','rb') as f:
             token = json.load(f)
     # conversion 
-    c = [0,0,0]
+    c = [0,0]
     for j in token.values():
           for i in range(len(prediction)):
                 if prediction[i] == j:
@@ -88,7 +91,7 @@ def predict():
     for key,value in token.items():
                 if index == value:
                       name.append(key)
-            
+   
     
     return jsonify({'message': name[0]})
 
