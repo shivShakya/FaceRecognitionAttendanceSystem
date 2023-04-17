@@ -1,2 +1,1 @@
-# finalProject
-# finalProject
+# celebrity_face_recognition
