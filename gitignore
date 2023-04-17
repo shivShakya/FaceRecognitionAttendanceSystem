@@ -1,0 +1,4 @@
+/backend/env
+/backend/__pycache__
+/face_recognition/node_modules
+/face_recognition/.vercel

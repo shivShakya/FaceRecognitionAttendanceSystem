@@ -10,7 +10,6 @@ import base64
 from flask_cors import CORS
 import pickle
 import json
-
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 app = Flask(__name__)
@@ -39,9 +38,6 @@ def upload():
     faceRecognition.getImageFromVideo(name+".mp4",name)
     return jsonify({'message': 'Video converted successfully'})
 
-
-
-
 #prediction 
 
 @app.route('/predict',methods=['POST'])
@@ -61,23 +57,26 @@ def predict():
    
     url = "backend/test_dict.json"
     X_test = test_data.getTestInput(url)
+
+
+
+    with open("backend/face_dict.json",'r') as f:
+        face_dict =   json.load(f)
+   
     
     #manually
-    #with open('model.pkl','rb') as f:
-              #model = pickle.load(f)
+    with open('backend/model.pkl','rb') as f:
+              model = pickle.load(f)
     
-    face_dict =  faceRecognition.load()
-    X,y = faceRecognition.getInput(face_dict)
-
-    model = faceRecognition.ModelFit(X,y)
+    #face_dict =  faceRecognition.load()
+    #X,y = faceRecognition.getInput(face_dict) 
+    #model = faceRecognition.ModelFit(X,y)
 
     prediction = model.predict(X_test)
-    print(prediction)
-
-    
-    
+   
     with open('backend/token.json','rb') as f:
             token = json.load(f)
+    
     # conversion 
     c = [0,0]
     for j in token.values():
@@ -91,8 +90,11 @@ def predict():
     for key,value in token.items():
                 if index == value:
                       name.append(key)
-   
     
+  
+
+    print(prediction)
+    print(name[0])
     return jsonify({'message': name[0]})
 
 

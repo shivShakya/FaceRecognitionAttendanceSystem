@@ -119,8 +119,8 @@ def load():
     if  os.path.exists("test_dict.json"):
       with open("test_dict.json","w") as f:
              json.dump(face_test_dict,f)
-             print('successfull')
-     
+             print('success')
+             
     return face_test_dict
 
 
